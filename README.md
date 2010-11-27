@@ -1,39 +1,75 @@
-Clippy - Helping you copy text to your clipboard (get the text form html element id)
-================================================
+jQuery-enabled Clippy - Helping you copy text to your clipboard
+===============================================================
 
-Source Code: http://github.com/jinzhu/clippy
-Modfied By:  ZhangJinzhu - wosmvp@gmail.com
+Source Code: http://github.com/mockko/clippy
+Modified By: Andrey Tarantsov <andreyvit@gmail.com>
 Based On:    http://github.com/mojombo/clippy
 
-Here is a sample Rails (Ruby) helper that can be used to place Clippy on a page:
-C
+This version of Clippy makes friends with (and requires) jQuery. Only the button is displayed; showing “copy to clipboard” and “copied!” texts is up to the user.
 
-    def clippy(htmlElementId, copied='已复制(#default is `copied!`)',copyto='复制到剪贴板(#default is `copy to clipboard`)',callBack='clippyCallBackFuncation(#default is nothing)',bgcolor='#FFFFFF')
-      html = <<-EOF
-        <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
-                width="110"
-                height="14"
-                id="clippy-#{rand().object_id}" >
-        <param name="movie" value="/flash/clippy.swf" />
-        <param name="allowScriptAccess" value="always" />
-        <param name="quality" value="high" />
-        <param name="scale" value="noscale" />
-        <param NAME="FlashVars" value="id=#{idhtmlElementId}&amp;copied=#{copied}&amp;copyto=#{copyto}&amp;callBack=#{callBack}">
-        <param name="bgcolor" value="#{bgcolor}">
-        <embed src="/flash/clippy.swf"
-               width="110"
-               height="14"
-               name="clippy"
-               quality="high"
-               allowScriptAccess="always"
-               type="application/x-shockwave-flash"
-               pluginspage="http://www.macromedia.com/go/getflashplayer"
-               FlashVars="id=#{idhtmlElementId}&amp;copied=#{copied}&amp;copyto=#{copyto}&amp;callBack=#{callBack}"
-               bgcolor="#{bgcolor}"
-        />
-        </object>
-      EOF
-    end
+Here's the code I use to insert Clippy:
+
+    var $copy = $('#copy-button'), $copyLabel = $('#copy-button-label');
+    $copy.clippy('/static/clippy-mockko.swf').bind({
+      'clippycopy': function(e, data) {
+        data.text = getRunURL();
+      },
+      'clippyover': function() {
+        $copyLabel.html("copy to clipboard");
+      },
+      'clippyout': function() {
+        $copyLabel.html("");
+      },
+      'clippycopied': function() {
+        $copyLabel.html("copied!");
+      }
+    });
+
+Clippy accepts a single FlashVar called `target` and uses `$.trigger` to trigger the following events on it: `clippycopy` (return the text to copy), `clippyover` (button hovered), `clippyout` (button unhovered), `clippycopied` (button clicked).
+
+Here is the jQuery plugin:
+
+    $.fn.clippy = function(url) {
+      return $(this).embedflash({
+        width: 14,
+        height: 14,
+        url: url,
+        vars: {
+          target: this.selector
+        }
+      });
+    };
+
+    $.fn.embedflash = function(options) {
+      var vars = (function() {
+        var result = [], _vars = options.vars || {}, k;
+        for (k in _vars) {
+          if (!_vars.hasOwnProperty(k)) continue;
+          result.push("" + (escape(k)) + "=" + (escape(_vars[k])));
+        }
+        return result;
+      })().join("&");
+      return $(this).html("<object classid=\"clsid:d27cdb6e-ae6d-11cf-96b8-444553540000\" width=\"" + (options.width) + "\" height=\"" + (options.height) + "\"> <param name=\"movie\" value=\"" + (escape(options.url)) + "\"/> <param name=\"allowScriptAccess\" value=\"always\" /> <param name=\"quality\" value=\"high\" /> <param name=\"wmode\" value=\"transparent\"/> <param name=\"scale\" value=\"noscale\" /> <param name=\"FlashVars\" value=\"" + (vars) + "\"> <embed src=\"" + (escape(options.url)) + "\" width=\"" + (options.width) + "\" height=\"" + (options.height) + "\" quality=\"high\" allowScriptAccess=\"always\" type=\"application/x-shockwave-flash\" pluginspage=\"http://www.macromedia.com/go/getflashplayer\" FlashVars=\"" + (vars) + "\" wmode=\"transparent\" /> </object>");
+    };
+
+This code has actually been compiled from the following CoffeeScript:
+
+    $copy.clippy('/static/clippy-mockko.swf').bind
+      'clippycopy':   (e, data) ->  data.text = getRunURL()
+      'clippyover':   ->            $copyLabel.html "copy to clipboard"
+      'clippyout':    ->            $copyLabel.html ""
+      'clippycopied': ->            $copyLabel.html "copied!"
+
+    $.fn.clippy = (url) ->
+      this.embedflash width: 14, height: 14, url, vars: { target: @selector }
+
+    $.fn.embedflash = (options) ->
+      { width, height, url } = options  # mandatory
+
+      vars = ("#{escape(k)}=#{escape(v)}" for k, v of options.vars || {}).join("&")
+
+      this.html("""<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="#{width}" height="#{height}"> <param name="movie" value="#{escape(url)}"/> <param name="allowScriptAccess" value="always" /> <param name="quality" value="high" /> <param name="wmode" value="transparent"/> <param name="scale" value="noscale" /> <param name="FlashVars" value="#{vars}"> <embed src="#{escape(url)}" width="#{width}" height="#{height}" quality="high" allowScriptAccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" FlashVars="#{vars}" wmode="transparent" /> </object>""")
+
 
 Installation (Pre-Built SWF)
 ---------------------------
