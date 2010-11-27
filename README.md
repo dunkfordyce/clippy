@@ -59,6 +59,9 @@ SWF, run the following from Clippy's root directory:
 If that is successful, copy `build/clippy.swf` to your
 `public` directory or wherever your static assets can be found.
 
+Please note that I haven't been able to build a working SWF using haXe 2.06
+on OS X. Using haXe 2.05 works fine.
+
 Contribute
 ----------
 
