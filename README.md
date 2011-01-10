@@ -10,7 +10,7 @@ This version of Clippy makes friends with (and requires) jQuery. Only the button
 Here's the code I use to insert Clippy:
 
     var $copy = $('#copy-button'), $copyLabel = $('#copy-button-label');
-    $copy.clippy('/static/clippy-mockko.swf').bind({
+    $copy.clippy('/static/clippy-mockko.swf', '#copy-button').bind({
       'clippycopy': function(e, data) {
         data.text = getRunURL();
       },
@@ -25,18 +25,18 @@ Here's the code I use to insert Clippy:
       }
     });
 
-Clippy accepts a single FlashVar called `target` and uses `$.trigger` to trigger the following events on it: `clippycopy` (return the text to copy), `clippyover` (button hovered), `clippyout` (button unhovered), `clippycopied` (button clicked).
+Clippy accepts two FlashVars 1) the url of the swf file and 2) the selector used to target the element.  It uses `$.trigger` to trigger the following events on it: `clippycopy` (return the text to copy), `clippyover` (button hovered), `clippyout` (button unhovered), `clippycopied` (button clicked).
 
 Here is the jQuery plugin:
 
-    jQuery.fn.clippy = function(url) {
+    jQuery.fn.clippy = function(url, target) {
       return jQuery(this).embedflash({
         width: 14,
         height: 14,
         url: url,
         vars: {
           text: jQuery(this).html(),
-          target: this.selector
+          target: target
         }
       });
     };
