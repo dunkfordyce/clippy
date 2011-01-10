@@ -10,8 +10,10 @@ class Clippy {
   // Main
   static function main() {
     var target:String   = flash.Lib.current.loaderInfo.parameters.target;
+    var defaultText:String   = flash.Lib.current.loaderInfo.parameters.text;
 
-    if(target   == null)  target   = "body";
+    if(target == null) target   = "body";
+    if(defaultText == null) defaultText   = "";
 
     flash.Lib.current.stage.scaleMode = flash.display.StageScaleMode.NO_SCALE;
     flash.Lib.current.stage.align     = flash.display.StageAlign.TOP_LEFT;
@@ -26,17 +28,17 @@ class Clippy {
     button.hitTestState     = flash.Lib.attach("button_down");
 
     button.addEventListener(MouseEvent.CLICK, function(e:MouseEvent) {
-      var text:String = ExternalInterface.call("function(target){ var data = { text: '' }; $(target).trigger('clippycopy', data); return data.text; }", target);
-      flash.system.System.setClipboard(text);
-      ExternalInterface.call("function(target){ $(target).trigger('clippycopied'); }", target);
+      var text:String = ExternalInterface.call("function(target){ var data = { text: '' }; jQuery(target).trigger('clippycopy', data); return data.text; }", target);
+      flash.system.System.setClipboard(text == '' ? defaultText : text);
+      ExternalInterface.call("function(target){ jQuery(target).trigger('clippycopied'); }", target);
     });
 
     button.addEventListener(MouseEvent.MOUSE_OVER, function(e:MouseEvent) {
-      ExternalInterface.call("function(target){ $(target).trigger('clippyover'); }", target);
+      ExternalInterface.call("function(target){ jQuery(target).trigger('clippyover'); }", target);
     });
 
     button.addEventListener(MouseEvent.MOUSE_OUT, function(e:MouseEvent) {
-      ExternalInterface.call("function(target){ $(target).trigger('clippyout'); }", target);
+      ExternalInterface.call("function(target){ jQuery(target).trigger('clippyout'); }", target);
     });
 
     flash.Lib.current.addChild(button);
