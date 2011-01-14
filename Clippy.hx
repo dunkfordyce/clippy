@@ -28,7 +28,7 @@ class Clippy {
     button.hitTestState     = flash.Lib.attach("button_down");
 
     button.addEventListener(MouseEvent.CLICK, function(e:MouseEvent) {
-      var text:String = ExternalInterface.call("function(target){ var data = { text: '' }; jQuery(target).trigger('clippycopy', data); return data.text; }", target);
+      var text:String = ExternalInterface.call("function(target, defaultText){ var data = { text: '', defaultText: defaultText }; jQuery(target).trigger('clippycopy', data); return data.text; }", target, defaultText);
       flash.system.System.setClipboard(text == '' ? defaultText : text);
       ExternalInterface.call("function(target){ jQuery(target).trigger('clippycopied'); }", target);
     });
