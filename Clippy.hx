@@ -23,15 +23,11 @@ class Clippy {
     var button:SimpleButton = new SimpleButton();
     button.useHandCursor    = true;
     button.upState          = flash.Lib.attach("button_up");
-    button.overState        = flash.Lib.attach("button_over");
-    button.downState        = flash.Lib.attach("button_down");
-    button.hitTestState     = flash.Lib.attach("button_down");
 
     button.addEventListener(MouseEvent.CLICK, function(e:MouseEvent) {
-      //var text:String = ExternalInterface.call("function(target, defaultText){ var data = { text: '', defaultText: defaultText }; jQuery(target).trigger('clippycopy', data); return data.text; }", target, defaultText);
-      flash.system.System.setClipboard('bob');
+      flash.system.System.setClipboard(defaultText);
 
-      //ExternalInterface.call("function(target){ jQuery(target).trigger('clippycopied'); }", target);
+      ExternalInterface.call("function(target){ jQuery(target).trigger('clippycopied'); }", target);
     });
 
     button.addEventListener(MouseEvent.MOUSE_OVER, function(e:MouseEvent) {
